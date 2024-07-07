@@ -156,6 +156,7 @@ namespace Clock
             string dayOfWeek = now.ToString("ddd");
             DateTextBlock.Text = $"{now.Month}/{now.Day} ({dayOfWeek})";
             DateTextBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            DateTextBlock.Visibility = Visibility.Visible;
         }
 
         private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -165,6 +166,7 @@ namespace Clock
             {
                 resizing = true;
                 timer.Stop();
+                DateTextBlock.Visibility = Visibility.Collapsed;
                 lastMousePosition = pos;
                 Mouse.Capture((UIElement)sender);
             }
