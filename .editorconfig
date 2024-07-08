@@ -14,3 +14,6 @@ dotnet_style_qualification_for_field = false
 
 # IDE0045: 条件式に変換します
 dotnet_style_prefer_conditional_expression_over_assignment = false
+
+# Default severity for analyzer diagnostics with category 'Style'
+dotnet_analyzer_diagnostic.category-Style.severity = none

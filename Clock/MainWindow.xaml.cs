@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Clock.Extensions;
+using Clock.WinApi;
 
 namespace Clock
 {
@@ -25,6 +26,8 @@ namespace Clock
         private Point _lastMousePosition;
         /// <summary> </summary>
         private Point? _lockPosition;
+        /// <summary> </summary>
+        private WinDHook _winDHook;
         /// <summary>
         /// 
         /// </summary>
@@ -41,6 +44,8 @@ namespace Clock
             _leaveTimer = new DispatcherTimer();
             _leaveTimer.Interval = TimeSpan.FromSeconds(0.5);
             _leaveTimer.Tick += LeaveTimer_Tick;
+
+            _winDHook = new WinDHook(this);
 
             Loaded += (s, e) => _redrawTimer.Start();
         }
@@ -363,6 +368,8 @@ namespace Clock
 
             // alt + tab の表示・非表示を切り替える
             _win32Api.ToggleAltTabVisibility(item.IsLocked() ? Visibility.Collapsed : Visibility.Visible);
+            // windows + D のキーをフック
+            _winDHook.Toggle(item.IsLocked());
         }
         /// <summary>
         /// 
