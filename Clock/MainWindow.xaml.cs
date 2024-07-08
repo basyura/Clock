@@ -5,68 +5,98 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Clock.Extensions;
 
 namespace Clock
 {
     public partial class MainWindow : Window
     {
-        private DispatcherTimer timer;
-        private DispatcherTimer leaveTimer;
-        private const int ResizeMargin = 10;
-        private bool resizing = false;
-        private Point lastMousePosition;
+        /// <summary> </summary>
+        private readonly Win32Api _win32Api;
 
+        /// <summary> </summary>
+        private readonly DispatcherTimer _redrawTimer;
+        /// <summary> </summary>
+        private readonly DispatcherTimer _leaveTimer;
+
+        /// <summary> </summary>
+        private bool _isResizing = false;
+        /// <summary> </summary>
+        private Point _lastMousePosition;
+        /// <summary> </summary>
+        private Point? _lockPosition;
+        /// <summary>
+        /// 
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += Timer_Tick;
 
-            leaveTimer = new DispatcherTimer();
-            leaveTimer.Interval = TimeSpan.FromSeconds(0.5);
-            leaveTimer.Tick += LeaveTimer_Tick;
+            _win32Api = new Win32Api(this);
+
+            _redrawTimer = new DispatcherTimer();
+            _redrawTimer.Interval = TimeSpan.FromSeconds(1);
+            _redrawTimer.Tick += RedrawTimer_Tick;
+
+            _leaveTimer = new DispatcherTimer();
+            _leaveTimer.Interval = TimeSpan.FromSeconds(0.5);
+            _leaveTimer.Tick += LeaveTimer_Tick;
+
+            Loaded += (s, e) => _redrawTimer.Start();
         }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            timer.Start();
-            DrawClockFace();
-            UpdateDate();
-        }
-
-        private void Timer_Tick(object sender, EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RedrawTimer_Tick(object sender, EventArgs e)
         {
             ClockCanvas.Children.Clear();
             DrawClockFace();
             DrawHands();
             UpdateDate();
+            UpdatePosition();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LeaveTimer_Tick(object sender, EventArgs e)
         {
-            leaveTimer.Stop();
+            _leaveTimer.Stop();
             MainGrid.Background = Brushes.Transparent;
             WindowBorder.BorderBrush = Brushes.Transparent;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (!resizing)
+            if (_isResizing)
             {
-                ClockCanvas.Children.Clear();
-                DrawClockFace();
-                DrawHands();
-                UpdateDate();
+                return;
             }
-        }
 
+            ClockCanvas.Children.Clear();
+            DrawClockFace();
+            DrawHands();
+            UpdateDate();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
         private void DrawClockFace()
         {
             double radius = Math.Min(ClockCanvas.ActualWidth, ClockCanvas.ActualHeight) / 2 - 10;
 
             // キャンバスのサイズが有効か確認します
-            if (radius <= 0) return;
+            if (radius <= 0)
+            {
+                return;
+            }
 
             Ellipse face = new Ellipse
             {
@@ -83,7 +113,10 @@ namespace Clock
             // 数字を描画
             DrawNumbers(radius);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="radius"></param>
         private void DrawNumbers(double radius)
         {
             double centerX = ClockCanvas.ActualWidth / 2;
@@ -110,7 +143,9 @@ namespace Clock
                 ClockCanvas.Children.Add(number);
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         private void DrawHands()
         {
             DateTime now = DateTime.Now;
@@ -118,7 +153,10 @@ namespace Clock
             Point center = new Point(ClockCanvas.ActualWidth / 2, ClockCanvas.ActualHeight / 2);
 
             // キャンバスのサイズが有効か確認します
-            if (radius <= 0) return;
+            if (radius <= 0)
+            {
+                return;
+            }
 
             // Hour hand
             DrawHand(center, radius * 0.5, (now.Hour % 12 + now.Minute / 60.0) * 30, Brushes.White, 6);
@@ -129,7 +167,14 @@ namespace Clock
             // Second hand
             DrawHand(center, radius * 0.9, now.Second * 6, Brushes.Red, 2);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="center"></param>
+        /// <param name="length"></param>
+        /// <param name="angle"></param>
+        /// <param name="brush"></param>
+        /// <param name="thickness"></param>
         private void DrawHand(Point center, double length, double angle, Brush brush, double thickness)
         {
             double radian = angle * Math.PI / 180;
@@ -149,7 +194,9 @@ namespace Clock
 
             ClockCanvas.Children.Add(hand);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         private void UpdateDate()
         {
             DateTime now = DateTime.Now;
@@ -158,16 +205,33 @@ namespace Clock
             DateTextBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             DateTextBlock.Visibility = Visibility.Visible;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UpdatePosition()
+        {
+            if (_lockPosition == null)
+            {
+                return;
+            }
 
+            Left = _lockPosition.Value.X;
+            Top = _lockPosition.Value.Y;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var pos = e.GetPosition(this);
-            if (this.Cursor == Cursors.SizeNWSE || this.Cursor == Cursors.SizeNESW)
+            Point pos = e.GetPosition(this);
+            if (Cursor == Cursors.SizeNWSE || Cursor == Cursors.SizeNESW)
             {
-                resizing = true;
-                timer.Stop();
+                _isResizing = true;
+                _redrawTimer.Stop();
+                _lastMousePosition = pos;
                 DateTextBlock.Visibility = Visibility.Collapsed;
-                lastMousePosition = pos;
                 Mouse.Capture((UIElement)sender);
             }
             else
@@ -183,14 +247,18 @@ namespace Clock
                 }
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Grid_MouseMove(object sender, MouseEventArgs e)
         {
-            var pos = e.GetPosition(this);
-            if (resizing)
+            Point pos = e.GetPosition(this);
+            if (_isResizing)
             {
-                double deltaX = pos.X - lastMousePosition.X;
-                double deltaY = pos.Y - lastMousePosition.Y;
+                double deltaX = pos.X - _lastMousePosition.X;
+                double deltaY = pos.Y - _lastMousePosition.Y;
 
                 if (this.Cursor == Cursors.SizeNWSE)
                 {
@@ -205,15 +273,16 @@ namespace Clock
                     this.Height = this.Width;
                 }
 
-                lastMousePosition = pos;
+                _lastMousePosition = pos;
                 return;
             }
 
-            if (pos.X >= this.ActualWidth - ResizeMargin && pos.Y >= this.ActualHeight - ResizeMargin)
+            int _resizeMargin = 10;
+            if (pos.X >= this.ActualWidth - _resizeMargin && pos.Y >= this.ActualHeight - _resizeMargin)
             {
                 this.Cursor = Cursors.SizeNWSE;
             }
-            else if (pos.X <= ResizeMargin && pos.Y >= this.ActualHeight - ResizeMargin)
+            else if (pos.X <= _resizeMargin && pos.Y >= this.ActualHeight - _resizeMargin)
             {
                 this.Cursor = Cursors.SizeNESW;
             }
@@ -222,14 +291,18 @@ namespace Clock
                 this.Cursor = Cursors.Arrow;
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Grid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (resizing)
+            if (_isResizing)
             {
-                resizing = false;
+                _isResizing = false;
+                _redrawTimer.Start();
                 this.Cursor = Cursors.Arrow;
-                timer.Start();
                 ClockCanvas.Children.Clear();
                 DrawClockFace();
                 DrawHands();
@@ -237,20 +310,66 @@ namespace Clock
                 Mouse.Capture(null);
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_MouseEnter(object sender, MouseEventArgs e)
         {
-            leaveTimer.Stop();
+            _leaveTimer.Stop();
             MainGrid.Background = Brushes.Black;
             WindowBorder.BorderBrush = Brushes.DarkSlateGray;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_MouseLeave(object sender, MouseEventArgs e)
         {
-            leaveTimer.Start();
+            _leaveTimer.Start();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TopMostMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            this.Topmost = !item.IsLocked();
+            item.ToggleLockState();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LockMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            _lockPosition = item.IsLocked() ? null : (Point?)new Point(Left, Top);
+            item.ToggleLockState();
+
+            // alt + tab の表示・非表示を切り替える
+            _win32Api.ToggleAltTabVisibility(item.IsLocked() ? Visibility.Collapsed : Visibility.Visible);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }

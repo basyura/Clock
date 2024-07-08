@@ -1,0 +1,16 @@
+﻿[*.cs]
+
+# IDE0058: 式の値が使用されていません
+csharp_style_unused_value_expression_statement_preference = unused_local_variable
+
+# IDE0058: 式の値が使用されていません
+dotnet_diagnostic.IDE0058.severity = none
+
+# IDE0003: 修飾子を削除
+dotnet_diagnostic.IDE0003.severity = none
+
+# IDE0003: 修飾子を削除
+dotnet_style_qualification_for_field = false
+
+# IDE0045: 条件式に変換します
+dotnet_style_prefer_conditional_expression_over_assignment = false

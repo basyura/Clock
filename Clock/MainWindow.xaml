@@ -3,9 +3,20 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Analog Clock" Height="200" Width="200" MinHeight="170" MinWidth="170"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        Loaded="Window_Loaded" ShowInTaskbar="False" MouseEnter="Window_MouseEnter" MouseLeave="Window_MouseLeave">
+        ShowInTaskbar="False" MouseEnter="Window_MouseEnter" MouseLeave="Window_MouseLeave">
     <Border Name="WindowBorder" BorderBrush="Transparent" BorderThickness="1">
-        <Grid Name="MainGrid" Background="Transparent" MouseLeftButtonDown="Grid_MouseLeftButtonDown" MouseMove="Grid_MouseMove" MouseLeftButtonUp="Grid_MouseLeftButtonUp">
+        <Grid Name="MainGrid" Background="Transparent" 
+              MouseLeftButtonDown="Grid_MouseLeftButtonDown" 
+              MouseMove="Grid_MouseMove" 
+              MouseLeftButtonUp="Grid_MouseLeftButtonUp">
+            <Grid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="top most" Click="TopMostMenuItem_Click"/>
+                    <MenuItem Header="lock" Click="LockMenuItem_Click"/>
+                    <Separator />
+                    <MenuItem Header="exit" Click="ExitMenuItem_Click"/>
+                </ContextMenu>
+            </Grid.ContextMenu>
             <Canvas Name="ClockCanvas" Background="Transparent"/>
             <TextBlock Name="DateTextBlock" Foreground="White" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 50 0 0"/>
         </Grid>
