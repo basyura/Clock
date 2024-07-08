@@ -1,9 +1,19 @@
 ﻿<Window x:Class="Clock.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Analog Clock" Height="200" Width="200" MinHeight="170" MinWidth="170"
-        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        ShowInTaskbar="False" MouseEnter="Window_MouseEnter" MouseLeave="Window_MouseLeave">
+        Title="Analog Clock" 
+        Height="200" 
+        Width="200" 
+        MinHeight="170" 
+        MinWidth="170"
+        WindowStyle="None" 
+        AllowsTransparency="True" 
+        Background="Transparent"
+        ShowInTaskbar="False"
+        MouseEnter="Window_MouseEnter"
+        MouseLeave="Window_MouseLeave"
+        PreviewMouseDoubleClick="Window_MouseDoubleClick"
+        >
     <Border Name="WindowBorder" BorderBrush="Transparent" BorderThickness="1">
         <Grid Name="MainGrid" Background="Transparent" 
               MouseLeftButtonDown="Grid_MouseLeftButtonDown" 
