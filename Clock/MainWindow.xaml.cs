@@ -117,6 +117,8 @@ namespace Clock
 
             // 数字を描画
             DrawNumbers(radius);
+            // 目盛線を描画
+            DrawTicks(radius);
         }
         /// <summary>
         /// 
@@ -130,8 +132,8 @@ namespace Clock
             for (int i = 0; i < 12; i++)
             {
                 double angle = i * 30 * Math.PI / 180;
-                double x = centerX + (radius - 20) * Math.Cos(angle - Math.PI / 2);
-                double y = centerY + (radius - 20) * Math.Sin(angle - Math.PI / 2);
+                double x = centerX + (radius - 22) * Math.Cos(angle - Math.PI / 2);
+                double y = centerY + (radius - 22) * Math.Sin(angle - Math.PI / 2);
 
                 TextBlock number = new TextBlock
                 {
@@ -146,6 +148,48 @@ namespace Clock
                 Canvas.SetLeft(number, x - textSize.Width / 2);
                 Canvas.SetTop(number, y - textSize.Height / 2);
                 ClockCanvas.Children.Add(number);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="radius"></param>
+        private void DrawTicks(double radius)
+        {
+            Point center = new Point(ClockCanvas.ActualWidth / 2, ClockCanvas.ActualHeight / 2);
+            // Create the hour ticks
+            for (int i = 0; i < 12; i++)
+            {
+                Line hourTick = new Line
+                {
+                    X1 = center.X,
+                    Y1 = center.Y - radius,
+                    X2 = center.X,
+                    Y2 = center.Y - radius + 10,
+                    Stroke = Brushes.White,
+                    StrokeThickness = 2,
+                    RenderTransform = new RotateTransform(i * 30, center.X, center.Y)
+                };
+                ClockCanvas.Children.Add(hourTick);
+            }
+
+            // Create the minute ticks
+            for (int i = 0; i < 60; i++)
+            {
+                if (i % 5 != 0) // Skip the hour ticks
+                {
+                    Line minuteTick = new Line
+                    {
+                        X1 = center.X,
+                        Y1 = center.Y - radius,
+                        X2 = center.X,
+                        Y2 = center.Y - radius + 5,
+                        Stroke = Brushes.White,
+                        StrokeThickness = 2,
+                        RenderTransform = new RotateTransform(i * 6, center.X, center.Y)
+                    };
+                    ClockCanvas.Children.Add(minuteTick);
+                }
             }
         }
         /// <summary>
