@@ -27,6 +27,8 @@ namespace Clock
         /// <summary> </summary>
         private Point? _lockPosition;
         /// <summary> </summary>
+        private bool _isShowTime;
+        /// <summary> </summary>
         private WinDHook _winDHook;
         /// <summary>
         /// 
@@ -111,6 +113,7 @@ namespace Clock
                 StrokeThickness = 2,
                 Fill = Brushes.Black // 時計の背景を黒に設定
             };
+
             Canvas.SetLeft(face, ClockCanvas.ActualWidth / 2 - radius);
             Canvas.SetTop(face, ClockCanvas.ActualHeight / 2 - radius);
             ClockCanvas.Children.Add(face);
@@ -253,6 +256,18 @@ namespace Clock
             DateTextBlock.Text = $"{now.Month}/{now.Day} ({dayOfWeek})";
             DateTextBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             DateTextBlock.Visibility = Visibility.Visible;
+
+
+            if (_isShowTime)
+            {
+                TimeTextBlock.Text = now.ToString("HH:mm");
+                TimeTextBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                TimeTextBlock.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                TimeTextBlock.Visibility = Visibility.Collapsed;
+            }
         }
         /// <summary>
         /// 
@@ -281,6 +296,7 @@ namespace Clock
                 _redrawTimer.Stop();
                 _lastMousePosition = pos;
                 DateTextBlock.Visibility = Visibility.Collapsed;
+                TimeTextBlock.Visibility = Visibility.Collapsed;
                 Mouse.Capture((UIElement)sender);
             }
             else
@@ -414,6 +430,17 @@ namespace Clock
             _win32Api.ToggleAltTabVisibility(item.IsLocked() ? Visibility.Collapsed : Visibility.Visible);
             // windows + D のキーをフック
             _winDHook.Toggle(item.IsLocked());
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TimeMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            _isShowTime = item.IsLocked() ? false : true;
+            item.ToggleLockState();
         }
         /// <summary>
         /// 

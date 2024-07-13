@@ -23,12 +23,14 @@
                 <ContextMenu>
                     <MenuItem Header="top most" Click="TopMostMenuItem_Click"/>
                     <MenuItem Header="lock" Click="LockMenuItem_Click"/>
+                    <MenuItem Header="time" Click="TimeMenuItem_Click"/>
                     <Separator />
                     <MenuItem Header="exit" Click="ExitMenuItem_Click"/>
                 </ContextMenu>
             </Grid.ContextMenu>
             <Canvas Name="ClockCanvas" Background="Transparent"/>
-            <TextBlock Name="DateTextBlock" Foreground="White" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 50 0 0"/>
+            <TextBlock Name="DateTextBlock" Foreground="White" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10 40 0 0"/>
+            <TextBlock Name="TimeTextBlock" Foreground="White" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 80 0 0"/>
         </Grid>
     </Border>
 </Window>
