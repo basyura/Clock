@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -26,9 +27,12 @@ namespace Clock
         public void Update()
         {
             _w.ClockCanvas.Children.Clear();
-            DrawClockFace();
-            DrawHands();
-            DrawDate();
+
+            DateTime now = DateTime.Now;
+
+            DrawClockFace(now);
+            DrawHands(now);
+            DrawDate(now);
             UpdatePosition();
         }
         /// <summary>
@@ -58,7 +62,7 @@ namespace Clock
         /// <summary>
         /// 
         /// </summary>
-        private void DrawClockFace()
+        private void DrawClockFace(DateTime now)
         {
             double radius = Math.Min(_w.ClockCanvas.ActualWidth, _w.ClockCanvas.ActualHeight) / 2 - 10;
 
@@ -84,7 +88,7 @@ namespace Clock
             // 数字を描画
             DrawNumbers(radius);
             // 目盛線を描画
-            DrawTicks(radius);
+            DrawTicks(radius, now);
         }
         /// <summary>
         /// 
@@ -120,9 +124,15 @@ namespace Clock
         /// 
         /// </summary>
         /// <param name="radius"></param>
-        private void DrawTicks(double radius)
+        private void DrawTicks(double radius, DateTime now)
         {
             Point center = new Point(_w.ClockCanvas.ActualWidth / 2, _w.ClockCanvas.ActualHeight / 2);
+            // 現在時刻に一致する場合に色をつける
+            int m = -1;
+            if (now.Minute % 5 == 0)
+            {
+                m = now.Minute / 5;
+            }
             // Create the hour ticks
             for (int i = 0; i < 12; i++)
             {
@@ -136,6 +146,15 @@ namespace Clock
                     StrokeThickness = 2,
                     RenderTransform = new RotateTransform(i * 30, center.X, center.Y)
                 };
+
+                // 現在時刻と一致した
+                if (i == m)
+                {
+                    hourTick.Stroke = Brushes.Red;
+                    hourTick.Y1 -= 5;
+                }
+
+
                 _w.ClockCanvas.Children.Add(hourTick);
             }
 
@@ -154,6 +173,13 @@ namespace Clock
                         StrokeThickness = 2,
                         RenderTransform = new RotateTransform(i * 6, center.X, center.Y)
                     };
+                    // 現在時刻と一致した場合に色をつける
+                    if (now.Minute == i)
+                    {
+                        minuteTick.Stroke = Brushes.Red;
+                        //minuteTick.Y2 += 2;
+                        minuteTick.Y1 -= 5;
+                    }
                     _w.ClockCanvas.Children.Add(minuteTick);
                 }
             }
@@ -161,9 +187,8 @@ namespace Clock
         /// <summary>
         /// 
         /// </summary>
-        private void DrawHands()
+        private void DrawHands(DateTime now)
         {
-            DateTime now = DateTime.Now;
             double radius = Math.Min(_w.ClockCanvas.ActualWidth, _w.ClockCanvas.ActualHeight) / 2 - 10;
             Point center = new Point(_w.ClockCanvas.ActualWidth / 2, _w.ClockCanvas.ActualHeight / 2);
 
@@ -212,9 +237,8 @@ namespace Clock
         /// <summary>
         /// 
         /// </summary>
-        private void DrawDate()
+        private void DrawDate(DateTime now)
         {
-            DateTime now = DateTime.Now;
             string dayOfWeek = now.ToString("ddd");
             _w.DateTextBlock.Text = $"{now.Month}/{now.Day} ({dayOfWeek})";
             _w.DateTextBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
