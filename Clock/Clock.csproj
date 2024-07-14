@@ -59,6 +59,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ClockShadow.cs" />
+    <Compile Include="Condition.cs" />
     <Compile Include="WinApi\KeyboardHook.cs" />
     <Compile Include="WinApi\Win32Api.cs" />
     <Compile Include="WinApi\WinDHook.cs" />
