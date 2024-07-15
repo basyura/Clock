@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -241,14 +240,12 @@ namespace Clock
         {
             string dayOfWeek = now.ToString("ddd");
             _w.DateTextBlock.Text = $"{now.Month}/{now.Day} ({dayOfWeek})";
-            _w.DateTextBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             _w.DateTextBlock.Visibility = Visibility.Visible;
 
 
             if (_condition.IsShowTime)
             {
                 _w.TimeTextBlock.Text = now.ToString("HH:mm");
-                _w.TimeTextBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                 _w.TimeTextBlock.Visibility = Visibility.Visible;
             }
             else

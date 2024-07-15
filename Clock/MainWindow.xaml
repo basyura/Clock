@@ -22,10 +22,10 @@
             <Grid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="top most" Click="TopMostMenuItem_Click"/>
-                    <MenuItem Header="lock" Click="LockMenuItem_Click"/>
-                    <MenuItem Header="time" Click="TimeMenuItem_Click"/>
+                    <MenuItem Header="lock"     Click="LockMenuItem_Click"/>
+                    <MenuItem Header="time"     Click="TimeMenuItem_Click"/>
                     <Separator />
-                    <MenuItem Header="exit" Click="ExitMenuItem_Click"/>
+                    <MenuItem Header="exit"     Click="ExitMenuItem_Click"/>
                 </ContextMenu>
             </Grid.ContextMenu>
             <Canvas Name="ClockCanvas" Background="Transparent"/>
