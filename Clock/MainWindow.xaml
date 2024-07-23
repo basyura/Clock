@@ -22,7 +22,7 @@
             <Grid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="top most" Click="TopMostMenuItem_Click"/>
-                    <MenuItem Header="lock"     Click="LockMenuItem_Click"/>
+                    <MenuItem Header="lock"     Click="LockMenuItem_Click" Name="LockMenu"/>
                     <MenuItem Header="time"     Click="TimeMenuItem_Click"/>
                     <Separator />
                     <MenuItem Header="exit"     Click="ExitMenuItem_Click"/>

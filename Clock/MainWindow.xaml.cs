@@ -64,6 +64,18 @@ namespace Clock
         /// <param name="e"></param>
         private void RedrawTimer_Tick(object sender, EventArgs e)
         {
+            // モニタの表示範囲内にいない場合
+            if (!this.IsWindowWithinAnyScreen())
+            {
+                // ロックされていたら解除する
+                if (LockMenu.IsLocked())
+                {
+                    ToggleLockState(LockMenu);
+                }
+                // 左上に移動する
+                _shadow.Move(0, 0);
+            }
+
             _shadow.Update();
         }
         /// <summary>
@@ -228,6 +240,14 @@ namespace Clock
         private void LockMenuItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem item = sender as MenuItem;
+            ToggleLockState(item);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        private void ToggleLockState(MenuItem item)
+        {
             // on/off 切り替え
             item.ToggleLockState();
 

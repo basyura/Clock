@@ -3,15 +3,19 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Clock.Extensions;
 
 namespace Clock
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ClockShadow
     {
         /// <summary></summary>
-        private MainWindow _w;
+        private readonly MainWindow _w;
         /// <summary></summary>
-        private Condition _condition = new Condition();
+        private readonly Condition _condition = new Condition();
         /// <summary>
         /// 
         /// </summary>
@@ -33,6 +37,14 @@ namespace Clock
             DrawHands(now);
             DrawDate(now);
             UpdatePosition();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Move(double left, double top)
+        {
+            _w.Left = left;
+            _w.Top = top;
         }
         /// <summary>
         /// 
